@@ -50,7 +50,7 @@ class GamePanel extends JPanel implements KeyListener{
     }
 	public void move(){
 		//swing
-		
+		obj.movePigs(objcaught);
 		double maxlength=400;
 		if (angle>=160){
 			direction=LEFT;
@@ -124,9 +124,7 @@ class GamePanel extends JPanel implements KeyListener{
 		
 		//drawing strings
 		Font font = new Font("Calisto MT", Font.PLAIN, 20);
-		g.setFont(font);
-
-		
+		g.setFont(font);		
 		g.drawString("Time: "+totals, 680, 55);
 		g.drawString("Goal: "+goals.get(level-1),20,90);
 		g.drawString("Level: "+level,680,90);
