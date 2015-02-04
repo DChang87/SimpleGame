@@ -3,6 +3,8 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+
 import javax.swing.*;
 
 import java.awt.image.*; 
@@ -25,6 +27,7 @@ class GamePanel extends JPanel implements KeyListener{
 	
 	//obj
 	private ArrayList<Integer> goals=new ArrayList<Integer>();
+	private int numDynamites;
 	private Image background,obj1;
 	private final int NOobj=-1;
 	private int objcaught=-1;
@@ -32,7 +35,10 @@ class GamePanel extends JPanel implements KeyListener{
 	private int totalval=0;
 	private int level=1;
 	public Objects obj = new Objects();
+	private boolean exploding = false;
+	private static Image dynamitePic = new ImageIcon("dynamite.png").getImage();;
 	public GamePanel(Miner m){
+		numDynamites=3;
 		keys = new boolean[65535];
 		goals.add(1);
 		background = new ImageIcon("goldminer1.jpg").getImage();
@@ -73,7 +79,6 @@ class GamePanel extends JPanel implements KeyListener{
 				System.out.println("length"+length);
 				totalval+=obj.val.get(objcaught);
 				obj.removeVal(objcaught);
-				obj.numobj--;
 				objcaught=-1;
 			}
 		}
@@ -97,6 +102,15 @@ class GamePanel extends JPanel implements KeyListener{
 	}
 	
 	
+	public void throwDynamite(){
+		if (keys[KeyEvent.VK_D] && numDynamites>0){
+			if (objcaught!=-1){
+				obj.removeVal(objcaught);
+				numDynamites-=1;
+				objcaught=-1;
+			}
+		}
+	}
 
 	public void changeTime(){
 		totals++;
@@ -120,11 +134,13 @@ class GamePanel extends JPanel implements KeyListener{
 		for (int i=0;i<obj.numobj;i++){
 			g.drawImage(obj.sprites.get(i),obj.x_val.get(i),obj.y_val.get(i),this);
 		}
+		for (int i=0;i<numDynamites;i++){
+			g.drawImage(dynamitePic,460+i*35,85,this);
+		}
 		g.setColor(Color.black);
-		
 		//drawing strings
 		Font font = new Font("Calisto MT", Font.PLAIN, 20);
-		g.setFont(font);		
+		g.setFont(font);
 		g.drawString("Time: "+totals, 680, 55);
 		g.drawString("Goal: "+goals.get(level-1),20,90);
 		g.drawString("Level: "+level,680,90);
