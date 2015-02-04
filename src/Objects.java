@@ -32,8 +32,8 @@ class Objects {
 	public Objects(){
 		addThings();
 	}
-	static Image pigleft;
-	static Image pigright;
+	private static Image pigleft;
+	private static Image pigright;
 	public void addThings(){
 		pigsrunning[0]=false;
 		pigsrunning[1]=true;
@@ -101,6 +101,7 @@ class Objects {
 		val.remove(objcaught);
 		sprites.remove(objcaught);
 		type.remove(objcaught);
+		numobj-=1;
 	}
 	public static void move(int objcaught, int endx,int endy){
 		//this method moves the obj that is caught with the clamp
@@ -108,6 +109,7 @@ class Objects {
 		x_val.set(objcaught,endx-sprites.get(objcaught).getWidth(null)/2);
 		y_val.set(objcaught,endy-sprites.get(objcaught).getHeight(null)/2);
 	}
+	
 	public static void movePigs(int objcaught){
 		for (int i=0;i<type.size();i++){
 			if (type.get(i)==PIG && i!=objcaught){
