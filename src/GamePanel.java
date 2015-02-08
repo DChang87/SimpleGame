@@ -24,19 +24,16 @@ class GamePanel extends JPanel implements KeyListener{
 	private boolean shooting;
 	public boolean ready=false;
 	private Miner mainFrame;
-	
 	//obj
 	private ArrayList<Integer> goals=new ArrayList<Integer>();
 	private int numDynamites;
-	private Image background,obj1;
-	private final int NOobj=-1;
-	private int objcaught=-1;
-	private int totals=0;
-	private int totalval=0;
-	private int level=1;
-	public Objects obj = new Objects();
-	private boolean exploding = false;
 	private static Image dynamitePic = new ImageIcon("dynamite.png").getImage();;
+	private Image background;
+	private int objcaught=-1;
+	private int totals=200;
+	private int totalval=0;
+	public Objects obj = new Objects();
+	
 	public GamePanel(Miner m){
 		numDynamites=3;
 		keys = new boolean[65535];
@@ -83,10 +80,10 @@ class GamePanel extends JPanel implements KeyListener{
 			}
 		}
 		else{
-			objcaught = obj.catchobj(endx,endy);
+			if (shootdire==down){
+				objcaught = obj.catchobj(endx,endy);
+			}
 		}
-		//System.out.println(objcaught+" objcaught");
-		//move
 		if (shooting){
 			length=Math.min(length+shootdire,maxlength);
 			length=Math.max(length+shootdire,50);
@@ -109,11 +106,15 @@ class GamePanel extends JPanel implements KeyListener{
 				numDynamites-=1;
 				objcaught=-1;
 			}
+		shootdire = up;
 		}
 	}
 
 	public void changeTime(){
-		totals++;
+		if (totals==0){
+			totals=1234;
+		}
+		totals--;
 	}
     // --------- Keystuff---------------
     public void keyTyped(KeyEvent e){}
@@ -142,8 +143,8 @@ class GamePanel extends JPanel implements KeyListener{
 		Font font = new Font("Calisto MT", Font.PLAIN, 20);
 		g.setFont(font);
 		g.drawString("Time: "+totals, 680, 55);
-		g.drawString("Goal: "+goals.get(level-1),20,90);
-		g.drawString("Level: "+level,680,90);
+		g.drawString("Goal: "+goals.get(obj.current_level-1),20,90);
+		g.drawString("obj.current_level: "+obj.current_level,680,90);
 		g.drawString("Money: "+totalval, 20, 55);
 
 	}
