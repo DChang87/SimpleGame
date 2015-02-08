@@ -28,14 +28,17 @@ class GamePanel extends JPanel implements KeyListener{
 	private ArrayList<Integer> goals=new ArrayList<Integer>();
 	private int numDynamites;
 	private static Image dynamitePic = new ImageIcon("dynamite.png").getImage();
-	private static Image TNT_Image = new ImageIcon("tnt.png").getImage();
-	public static ArrayList<Integer> exploded_TNT = new ArrayList<Integer>();
+	public static Image TNT_Image = new ImageIcon("tnt.png").getImage();
+	private static Image boomPic = new ImageIcon("boom.png").getImage();
+	public static ArrayList<ArrayList<Integer>> explode_nextRound = new ArrayList<ArrayList<Integer>>(); //all of the TNT that should be exploded
+	public static ArrayList<ArrayList<Integer>> explode_thisRound = new ArrayList<ArrayList<Integer>>();
 	private Image background;
+	private int TNT_timer=0;
+	private int boom_timer = -1;
 	private int objcaught=-1;
 	private int totals=200;
 	private int totalval=0;
 	public Objects obj = new Objects();
-	
 	public GamePanel(Miner m){
 		numDynamites=3;
 		keys = new boolean[65535];
@@ -70,19 +73,25 @@ class GamePanel extends JPanel implements KeyListener{
 		else if (shootdire!= up && length<maxlength){
 			shootdire=down;
 		}
-		//insert TNT function calling code
+		//calling old TNT's and checking for new exploding ones that the user reached
 		for (int i=0;i<obj.numTNT;i++){
-			if (obj.distance(obj.TNT_x.get(i)+TNT_Image.getWidth(null)/2,endx)<=TNT_Image.getWidth(null)/2 &&obj.distance(obj.TNT_y.get(i)+TNT_Image.getHeight(null)/2,endx)<=TNT_Image.getHeight(null)/2){
-				obj.checkTNT(i);
+			//System.out.println("LOOP WITH TNT");
+			if (obj.distance(obj.TNT_pos.get(i).get(0)+TNT_Image.getWidth(null)/2,endx)<=TNT_Image.getWidth(null)/2 &&obj.distance(obj.TNT_pos.get(i).get(1)+TNT_Image.getHeight(null)/2,endx)<=TNT_Image.getHeight(null)/2){
+				explode_thisRound.add(obj.TNT_pos.get(i));
 			}
 		}
+		for (int i=0;i<explode_thisRound.size();i++){
+			//get the co-ords at explode_thisRound, find the index at TNT_pos and call checkTNT on it to add more things to explode_nextRound;
+			System.out.println("THIS ROUND LOOP"+explode_thisRound.size());
+			obj.checkTNT(obj.TNT_pos.indexOf(explode_thisRound.get(i)));
+		}
+		
 		if (objcaught!=-1){
 			//this means that a piece of obj has been caught
 			obj.move(objcaught,endx,endy);
 			shootdire=obj.speed.get(objcaught);
 			if (length==50){
-				System.out.println("length"+length);
-				totalval+=obj.val.get(objcaught);
+				totalval+=obj.integer_data.get(objcaught).get(obj.VAL);
 				obj.removeVal(objcaught);
 				objcaught=-1;
 			}
@@ -119,10 +128,15 @@ class GamePanel extends JPanel implements KeyListener{
 	}
 
 	public void changeTime(){
+		//System.out.println("changetime");
 		if (totals==0){
 			totals=1234;
 		}
 		totals--;
+		if (boom_timer!=-1){
+			System.out.println("changetime yo");
+			boom_timer+=1;
+		}
 	}
     // --------- Keystuff---------------
     public void keyTyped(KeyEvent e){}
@@ -133,6 +147,7 @@ class GamePanel extends JPanel implements KeyListener{
     	keys[e.getKeyCode()]=false;
     }
 	public void paintComponent(Graphics g){
+		//System.out.println("paint"+TNT_timer);
 		g.drawImage(background,0,0,this);  
 		g.setColor(Color.black);
 		endx=startx+(int)(length*Math.cos(Math.toRadians(angle)));
@@ -141,21 +156,57 @@ class GamePanel extends JPanel implements KeyListener{
 		g.setColor(Color.yellow);
 		Graphics2D g2d = (Graphics2D)g;
 		for (int i=0;i<obj.numobj;i++){
-			g.drawImage(obj.sprites.get(i),obj.x_val.get(i),obj.y_val.get(i),this);
+			g.drawImage(obj.sprites.get(i),obj.integer_data.get(i).get(obj.X),obj.integer_data.get(i).get(obj.Y),this);
 		}
 		for (int i=0;i<numDynamites;i++){
 			g.drawImage(dynamitePic,460+i*35,85,this);
 		}
 		for (int i=0;i<obj.numTNT;i++){
-			g.drawImage(TNT_Image,obj.TNT_x.get(i),obj.TNT_y.get(i),this);
+			g.drawImage(TNT_Image,obj.TNT_pos.get(i).get(0),obj.TNT_pos.get(i).get(1),this);
 		}
 		g.setColor(Color.black);
+		//g.drawOval(300+TNT_Image.getWidth(null)-150, 300+TNT_Image.getHeight(null)-150, 300, 300);
+		//g.drawOval(300-100, 300-100, 200, 200);
+		//g.drawOval(300+TNT_Image.getWidth(null)/2,300+TNT_Image.getHeight(null)/2,20,20);
+		//g.drawOval(300+TNT_Image.getWidth(null)/2-200, 300+TNT_Image.getHeight(null)/2-200, 200, 200);
 		//drawing strings
 		Font font = new Font("Calisto MT", Font.PLAIN, 20);
 		g.setFont(font);
 		g.drawString("Time: "+totals, 680, 55);
 		g.drawString("Goal: "+goals.get(obj.current_level-1),20,90);
-		g.drawString("obj.current_level: "+obj.current_level,680,90);
+		g.drawString("current level: "+obj.current_level,680,90);
 		g.drawString("Money: "+totalval, 20, 55);
+		//System.out.println("timer"+boom_timer+explode_thisRound.size());
+		for (int i=0;i<explode_thisRound.size();i++){
+			//System.out.println("explode?");
+			if (boom_timer<1){
+				g.drawImage(boomPic,explode_thisRound.get(i).get(0)+TNT_Image.getWidth(null)/2-boomPic.getWidth(null)/2,explode_thisRound.get(i).get(1)+TNT_Image.getHeight(null)/2-boomPic.getHeight(null)/2,this);
+				//ystem.out.println("explode?");
+				if (boom_timer==-1){
+					boom_timer=0;
+					shootdire=up;
+				}
+			}
+			else{
+				obj.TNT_pos.remove(explode_thisRound.get(i));
+				obj.numTNT-=1;
+				
+				boom_timer=-1; //-1 indicates that it will not be timed until the timer is back at 0
+			}
+			//System.out.println("timerAFTER"+boom_timer);
+		}
+		if (boom_timer==-1){
+			explode_thisRound.clear();
+		}
+		if (1000<TNT_timer && TNT_timer<=3000){
+			System.out.println("TRUE");
+			//if it is time, draw the exploding TNT's and replace them with the ones that will be exploded next time the timer is at 2
+			for (int i=0;i<explode_nextRound.size();i++){
+				explode_thisRound.add(explode_nextRound.get(i));
+			}
+			explode_nextRound.clear();
+			TNT_timer=0;
+		}
+		TNT_timer++;
 	}
 }
