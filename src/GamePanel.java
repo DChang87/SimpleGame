@@ -27,7 +27,9 @@ class GamePanel extends JPanel implements KeyListener{
 	//obj
 	private ArrayList<Integer> goals=new ArrayList<Integer>();
 	private int numDynamites;
-	private static Image dynamitePic = new ImageIcon("dynamite.png").getImage();;
+	private static Image dynamitePic = new ImageIcon("dynamite.png").getImage();
+	private static Image TNT_Image = new ImageIcon("tnt.png").getImage();
+	public static ArrayList<Integer> exploded_TNT = new ArrayList<Integer>();
 	private Image background;
 	private int objcaught=-1;
 	private int totals=200;
@@ -67,6 +69,12 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 		else if (shootdire!= up && length<maxlength){
 			shootdire=down;
+		}
+		//insert TNT function calling code
+		for (int i=0;i<obj.numTNT;i++){
+			if (obj.distance(obj.TNT_x.get(i)+TNT_Image.getWidth(null)/2,endx)<=TNT_Image.getWidth(null)/2 &&obj.distance(obj.TNT_y.get(i)+TNT_Image.getHeight(null)/2,endx)<=TNT_Image.getHeight(null)/2){
+				obj.checkTNT(i);
+			}
 		}
 		if (objcaught!=-1){
 			//this means that a piece of obj has been caught
@@ -138,6 +146,9 @@ class GamePanel extends JPanel implements KeyListener{
 		for (int i=0;i<numDynamites;i++){
 			g.drawImage(dynamitePic,460+i*35,85,this);
 		}
+		for (int i=0;i<obj.numTNT;i++){
+			g.drawImage(TNT_Image,obj.TNT_x.get(i),obj.TNT_y.get(i),this);
+		}
 		g.setColor(Color.black);
 		//drawing strings
 		Font font = new Font("Calisto MT", Font.PLAIN, 20);
@@ -146,7 +157,5 @@ class GamePanel extends JPanel implements KeyListener{
 		g.drawString("Goal: "+goals.get(obj.current_level-1),20,90);
 		g.drawString("obj.current_level: "+obj.current_level,680,90);
 		g.drawString("Money: "+totalval, 20, 55);
-
 	}
-    
 }
