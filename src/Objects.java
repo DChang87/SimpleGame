@@ -19,6 +19,9 @@ class Objects {
 	public static ArrayList<Image> sprites = new ArrayList<Image>();
 	public static ArrayList<Integer> direction = new ArrayList<Integer>();
 	public static ArrayList<Integer> type = new ArrayList<Integer>();
+	public static ArrayList<Integer> TNT_x = new ArrayList<Integer>();
+	public static ArrayList<Integer> TNT_y = new ArrayList<Integer>();
+	
 	public static int numobj=6; //CHANGE TO 0
 	public static int numTNT;
 	public static int numlevels=2;
@@ -68,6 +71,13 @@ class Objects {
 			type.add(infile.nextInt());
 		}
 		numTNT = Integer.parseInt(infile.nextLine());
+		for (int i=0;i<numTNT;i++){
+			TNT_x.add(infile.nextInt());
+		}
+		for (int i=0;i<numTNT;i++){
+			TNT_y.add(infile.nextInt());
+		}
+		//read in x,y position of TNT since all TNT are equal in power
 	}
 	public static int catchobj(int endx, int endy){
 		for (int i=0;i<numobj;i++){
@@ -80,6 +90,35 @@ class Objects {
 	}
 	public static int distance(int a,int b){
 		return Math.abs(b-a);
+	}
+	public static double distance_2(int x1,int y1,int x2,int y2){
+		return Math.sqrt((Math.pow(distance(x1,x2),2)+Math.pow(distance(y1,y2),2)));
+	}
+	public static void checkTNT(int check_Val){
+		ArrayList<Integer> to_Remove = new ArrayList<Integer>();
+		
+		//blit exploding pic
+		//75 is current explosion radius
+		for (int i=0;i<numobj;i++){
+			if (distance_2(x_val.get(i),y_val.get(i),TNT_x.get(check_Val),TNT_y.get(check_Val))<75){
+				to_Remove.add(i);
+			}
+		}
+		
+		for (int i=0;i<to_Remove.size();i++){
+			removeVal(to_Remove.get(i));
+		}
+		GamePanel.exploded_TNT.add(check_Val);
+		int x = TNT_x.get(check_Val);
+		int y = TNT_y.get(check_Val);
+		for (int i=0;i<numTNT;i++){
+			if (i!=check_Val & distance_2(TNT_x.get(check_Val),TNT_y.get(check_Val),TNT_x.get(i),TNT_y.get(i))<75){
+				checkTNT(i);
+			}
+		}
+		TNT_x.remove(new Integer(x));
+		TNT_y.remove(new Integer(y));
+		numTNT-=1;
 	}
 	public static void removeVal(int objcaught){
 		x_val.remove(objcaught);
