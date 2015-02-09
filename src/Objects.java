@@ -4,38 +4,40 @@ import java.awt.geom.*;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+
 import javax.swing.*;
+
 import java.awt.image.*; 
 import java.io.*; 
+
 import javax.imageio.*; 
 import javax.swing.JPanel;
+
 import java.util.*;
 
 class Objects {
-	public static ArrayList<ArrayList<Integer>> integer_data= new ArrayList<ArrayList<Integer>>(); 
-	public static ArrayList<Double> speed = new ArrayList<Double>();
-	public static ArrayList<Image> sprites = new ArrayList<Image>();
-	public static ArrayList<ArrayList<Integer>> TNT_pos = new ArrayList<ArrayList<Integer>>();
-	
+	private static ArrayList<ArrayList<Integer>> integer_data= new ArrayList<ArrayList<Integer>>(); 
+	private static ArrayList<Double> speed = new ArrayList<Double>();
+	private static ArrayList<Image> sprites = new ArrayList<Image>();
+	private static ArrayList<ArrayList<Integer>> TNT_pos = new ArrayList<ArrayList<Integer>>();
+	private static int goals;
 	public static int numobj=6; //CHANGE TO 0
 	public static int numTNT;
 	public static int numlevels=2;
-	public static int current_level;
 	public static final int GOLD = 1, ROCK = 2;
+	private static int times;
 	public static final int PIG=3, LEFT = 0, RIGHT=1,NODIRECTION=2;
 	public static boolean [] pigsrunning = new boolean[2];
 	private final static int NOobj=-1;
+	private static Image pigleft,pigright;
+	public final static int X=0,Y=1,VAL=2,DIRECTION=3,TYPE=4;
 	public Objects(){
-		current_level=1;
 		pigleft = new ImageIcon("pig.png").getImage();
 		pigright= new ImageIcon("pig2.png").getImage();
 		pigsrunning[0]=false;
 		pigsrunning[1]=true;
-		loadMyStuff(current_level);
+		loadMyStuff(GamePanel.returnLevel());
 	}
-	private static Image pigleft;
-	public final static int X=0,Y=1,VAL=2,DIRECTION=3,TYPE=4;
-	private static Image pigright;
 	public static void loadMyStuff(int level){
 		Scanner infile = null;
 		try{
@@ -75,6 +77,9 @@ class Objects {
 		for (int i=0;i<numTNT;i++){
 			TNT_pos.get(i).add(infile.nextInt());
 		}
+		times= infile.nextInt();
+		goals=infile.nextInt(); //add the goal for this level;
+		System.out.println("Times"+times);
 	}
 	public static int catchobj(int endx, int endy){
 		for (int i=0;i<numobj;i++){
@@ -83,6 +88,18 @@ class Objects {
 			}	
 		}
 		return NOobj;
+	}
+	public static int returnTimes(){
+		return times;
+	}
+	public static void clearEverything(){
+		integer_data.clear();
+		speed.clear();
+		sprites.clear();
+		TNT_pos.clear();
+	}
+	public static int returnNumObj(){
+		return numobj;
 	}
 	public static int distance(int a,int b){
 		return Math.abs(b-a);
@@ -107,8 +124,6 @@ class Objects {
 		for (int i=0;i<to_Remove.size();i++){
 			removeVal(integer_data.indexOf(to_Remove.get(i)));
 		}
-		int x = TNT_pos.get(check_Val).get(0);
-		int y = TNT_pos.get(check_Val).get(1);
 		for (int i=0;i<numTNT;i++){
 			if (i!=check_Val & distance_2(TNT_pos.get(check_Val).get(0),TNT_pos.get(check_Val).get(1),TNT_pos.get(i).get(0),TNT_pos.get(i).get(1))<150){
 				GamePanel.explode_nextRound.add(TNT_pos.get(i));
@@ -122,9 +137,32 @@ class Objects {
 		integer_data.remove(objcaught);
 		numobj-=1;
 	}
+	public static int returnIntData(int indexA,int indexB){
+		return integer_data.get(indexA).get(indexB);
+	}
+	public static int returnGoals(){
+		return goals;
+	}
+	public static double returnSpeed(int index){
+		return speed.get(index);
+	}
+	public static Image returnSprites(int index){
+		return sprites.get(index);
+	}
+	public static int returnTNT_pos(int indexA,int indexB){
+		return TNT_pos.get(indexA).get(indexB);
+	}
+	public static void removeTNT_pos(ArrayList<Integer> object){
+		TNT_pos.remove(object);
+	}
+	public static ArrayList<Integer> returnTNT_pos2(int index){
+		return TNT_pos.get(index);
+	}
+	public static int returnTNT_posSize(){
+		return TNT_pos.size();
+	}
 	public static void move(int objcaught, int endx,int endy){
 		//this method moves the obj that is caught with the clamp
-		//System.out.println("moveobj");
 		integer_data.get(objcaught).set(X,endx-sprites.get(objcaught).getWidth(null)/2);
 		integer_data.get(objcaught).set(Y,endy-sprites.get(objcaught).getHeight(null)/2);
 	}
@@ -140,8 +178,8 @@ class Objects {
 					}
 				}
 				else{
-					integer_data.get(i).set(X,integer_data.get(X).get(i)+2);
-					if( integer_data.get(i).get(X)>=800-sprites.get(i).getWidth(null)){
+					integer_data.get(i).set(X,integer_data.get(i).get(X)+2);
+					if(integer_data.get(i).get(X)>=800-sprites.get(i).getWidth(null)){
 						sprites.set(i, pigleft);
 						integer_data.get(i).set(DIRECTION,LEFT);
 					}
