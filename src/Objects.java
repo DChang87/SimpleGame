@@ -107,6 +107,8 @@ class Objects {
 		//record the TNT that is also exploded by the current TNT so it can explode later (so they don't ALL explode at the same time because that's not cool)
 		ArrayList<ArrayList<Integer>> to_Remove = new ArrayList<ArrayList<Integer>>();		//stores the integer_value data for identification later
 		for (int i=0;i<numobj;i++){
+			System.out.println(check_Val+"checkval");
+			System.out.println(TNT_pos.get(check_Val).toString()+"TNTpos");
 			if (checkCollision(TNT_pos.get(check_Val).get(0)+GamePanel.TNT_Image.getWidth(null)/2,TNT_pos.get(check_Val).get(1)+GamePanel.TNT_Image.getHeight(null),integer_data.get(i).get(X),integer_data.get(i).get(Y),sprites.get(i).getWidth(null),sprites.get(i).getHeight(null))){
 				to_Remove.add(integer_data.get(i));
 			}
