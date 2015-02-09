@@ -79,11 +79,14 @@ class Objects {
 		}
 		times= infile.nextInt();
 		goals=infile.nextInt(); //add the goal for this level;
-		System.out.println("Times"+times);
 	}
-	public static int catchobj(int endx, int endy){
+	public static int catchobj(){
 		for (int i=0;i<numobj;i++){
-			if (distance(endy,integer_data.get(i).get(Y)+sprites.get(i).getHeight(null)/2)<=sprites.get(i).getHeight(null)/2 && distance(endx,integer_data.get(i).get(X)+sprites.get(i).getWidth(null)/2)<=sprites.get(i).getWidth(null)/2){
+			if (distance(GamePanel.endy,integer_data.get(i).get(Y)+sprites.get(i).getHeight(null)/2)<=sprites.get(i).getHeight(null)/2 && distance(GamePanel.endx,integer_data.get(i).get(X)+sprites.get(i).getWidth(null)/2)<=sprites.get(i).getWidth(null)/2){
+				//GamePanel.endy=integer_data.get(i).get(Y);
+				//GamePanel.endx=integer_data.get(i).get(X);
+				//System.out.println(GamePanel.endx+" "+GamePanel.endy);
+				///set the position to the clamp to where the clamp touched the sprite
 				return i; 
 			}	
 		}
@@ -115,8 +118,6 @@ class Objects {
 		//record the TNT that is also exploded by the current TNT so it can explode later (so they don't ALL explode at the same time because that's not cool)
 		ArrayList<ArrayList<Integer>> to_Remove = new ArrayList<ArrayList<Integer>>();		//stores the integer_value data for identification later
 		for (int i=0;i<numobj;i++){
-			System.out.println(check_Val+"checkval");
-			System.out.println(TNT_pos.get(check_Val).toString()+"TNTpos");
 			if (checkCollision(TNT_pos.get(check_Val).get(0)+GamePanel.TNT_Image.getWidth(null)/2,TNT_pos.get(check_Val).get(1)+GamePanel.TNT_Image.getHeight(null),integer_data.get(i).get(X),integer_data.get(i).get(Y),sprites.get(i).getWidth(null),sprites.get(i).getHeight(null))){
 				to_Remove.add(integer_data.get(i));
 			}
@@ -163,6 +164,7 @@ class Objects {
 	}
 	public static void move(int objcaught, int endx,int endy){
 		//this method moves the obj that is caught with the clamp
+		
 		integer_data.get(objcaught).set(X,endx-sprites.get(objcaught).getWidth(null)/2);
 		integer_data.get(objcaught).set(Y,endy-sprites.get(objcaught).getHeight(null)/2);
 	}
