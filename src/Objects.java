@@ -13,13 +13,8 @@ import java.util.*;
 
 class Objects {
 	public static ArrayList<ArrayList<Integer>> integer_data= new ArrayList<ArrayList<Integer>>(); 
-	//public static ArrayList<Integer> integer_data.get(X) = new ArrayList<Integer>();
-	//public static ArrayList<Integer> integer_data.get(Y) = new ArrayList<Integer>();
-	//public static ArrayList<Integer> val = new ArrayList<Integer>();
 	public static ArrayList<Double> speed = new ArrayList<Double>();
 	public static ArrayList<Image> sprites = new ArrayList<Image>();
-	//public static ArrayList<Integer> integer_data.get(DIRECTION) = new ArrayList<Integer>();
-	//public static ArrayList<Integer> integer_data.get(TYPE) = new ArrayList<Integer>();
 	public static ArrayList<ArrayList<Integer>> TNT_pos = new ArrayList<ArrayList<Integer>>();
 	
 	public static int numobj=6; //CHANGE TO 0
@@ -80,14 +75,10 @@ class Objects {
 		for (int i=0;i<numTNT;i++){
 			TNT_pos.get(i).add(infile.nextInt());
 		}
-		//System.out.println(integer_data.get(X).toString());
-		///System.out.println(integer_data.get(Y).toString());
-		//read in x,y position of TNT since all TNT are equal in power
 	}
 	public static int catchobj(int endx, int endy){
 		for (int i=0;i<numobj;i++){
 			if (distance(endy,integer_data.get(i).get(Y)+sprites.get(i).getHeight(null)/2)<=sprites.get(i).getHeight(null)/2 && distance(endx,integer_data.get(i).get(X)+sprites.get(i).getWidth(null)/2)<=sprites.get(i).getWidth(null)/2){
-				//System.out.println(i+"OBJECTCAUGHT");
 				return i; 
 			}	
 		}
