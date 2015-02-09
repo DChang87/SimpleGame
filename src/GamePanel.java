@@ -41,11 +41,12 @@ class GamePanel extends JPanel implements KeyListener{
 	private int manDirection=NODIRECTION;
 	private int boom_timer = -1;
 	private int objcaught=-1;
-	private int totals=200;
+	private int totals;
 	private int totalval=0;
 	public Objects obj = new Objects();
 	public GamePanel(Miner m){
 		System.out.println("GAME PANEL");
+		totals=obj.returnTimes();
 		numDynamites=3;
 		keys = new boolean[65535];
 		goals.add(1);
@@ -151,8 +152,23 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 	}
 	public void timesUp(){
-		obj.loadMyStuff(++current_level);
-		totals = obj.returnTimes(current_level);
+		JOptionPane.showMessageDialog (null, "Time is up for level"+current_level);
+		newLevel();
+	}
+	public void checkIfLevelIsDone(){
+		if (obj.returnNumObj()==0){
+			JOptionPane.showMessageDialog (null, "You have grabbed everything for level"+current_level);
+			newLevel();
+		}
+	}
+	public void newLevel(){
+		System.out.println("current level"+current_level);
+		current_level+=1;
+		obj.clearEverything();
+		System.out.println("current level"+current_level);
+		obj.loadMyStuff(current_level);
+		totals = obj.returnTimes();
+		System.out.println("return times"+totals);
 	}
 	public void changeTime(){
 		
@@ -209,8 +225,8 @@ class GamePanel extends JPanel implements KeyListener{
 		Font font = new Font("Calisto MT", Font.PLAIN, 20);
 		g.setFont(font);
 		g.drawString("Time: "+totals, 680, 55);
-		g.drawString("Goal: "+goals.get(current_level-1),20,90);
-		g.drawString("current level: "+current_level,680,90);
+		g.drawString("Goal: "+obj.returnGoals(),20,90);
+		g.drawString("Level: "+current_level,680,90);
 		g.drawString("Money: "+totalval, 20, 55);
 		for (int i=0;i<explode_thisRound.size();i++){
 			if (boom_timer<1){
