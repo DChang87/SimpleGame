@@ -17,7 +17,8 @@ import java.util.*;
 
 class GamePanel extends JPanel implements KeyListener{
 	private final int RIGHT=1,LEFT=-1,NODIRECTION=0;
-	private int endx,endy,direction=LEFT,startx,starty;
+	public static int endx,endy;
+	private int direction=LEFT,startx,starty;
 	private double angle=20;
 	private boolean[] keys;
 	//old down = 3, up = -0.5
@@ -45,7 +46,6 @@ class GamePanel extends JPanel implements KeyListener{
 	private int totalval=0;
 	public Objects obj = new Objects();
 	public GamePanel(Miner m){
-		System.out.println("GAME PANEL");
 		totals=obj.returnTimes();
 		numDynamites=3;
 		keys = new boolean[65535];
@@ -123,7 +123,7 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 		else{
 			if (shootdire==down){
-				objcaught = obj.catchobj(endx,endy);
+				objcaught = obj.catchobj();
 			}
 		}
 		if (shooting){
@@ -162,18 +162,28 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 	}
 	public void newLevel(){
-		System.out.println("current level"+current_level);
 		current_level+=1;
-		obj.clearEverything();
-		System.out.println("current level"+current_level);
-		obj.loadMyStuff(current_level);
-		totals = obj.returnTimes();
-		System.out.println("return times"+totals);
+		if (current_level>5){
+			gameFinished();
+		}
+		else{
+			obj.clearEverything();
+			obj.loadMyStuff(current_level);
+			totals = obj.returnTimes();
+			length=50;
+		}
+		
+	}
+	public void gameFinished(){
+		
 	}
 	public void changeTime(){
 		
 		if (totals==0){
 			timesUp();
+		}
+		else{
+			checkIfLevelIsDone();
 		}
 		totals--;
 		if (boom_timer!=-1){
@@ -196,12 +206,10 @@ class GamePanel extends JPanel implements KeyListener{
 		g.setColor(Color.black);
 		
 		if (manDirection==RIGHT && manPos!=450){
-			System.out.println("RIGHT");
 			//endx=Math.max(0,endx-10);
 			angle=Math.min(160, angle+0.7);
 		}
 		else if (manDirection==LEFT && manPos!=0){
-			System.out.println("LEFT");
 			angle=Math.max(0, angle-0.7);
 			//endx=Math.min(800, endx+10);
 		}
