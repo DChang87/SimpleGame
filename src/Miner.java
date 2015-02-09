@@ -30,6 +30,7 @@ public class Miner extends JFrame implements ActionListener {
 		
 		if (source==myTimer){
 			game.move();
+			game.moveMan();
 			game.throwDynamite();
 		}
 		if (source==gameTimer){
