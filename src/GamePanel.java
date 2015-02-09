@@ -59,7 +59,7 @@ class GamePanel extends JPanel implements KeyListener{
 	public void move(){
 		//swing
 		obj.movePigs(objcaught);
-		double maxlength=400;
+		double maxlength=550;
 		if (angle>=160){
 			direction=LEFT;
 		}
@@ -75,9 +75,10 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 		//calling old TNT's and checking for new exploding ones that the user reached
 		for (int i=0;i<obj.numTNT;i++){
-			//System.out.println("LOOP WITH TNT");
-			if (obj.distance(obj.TNT_pos.get(i).get(0)+TNT_Image.getWidth(null)/2,endx)<=TNT_Image.getWidth(null)/2 &&obj.distance(obj.TNT_pos.get(i).get(1)+TNT_Image.getHeight(null)/2,endx)<=TNT_Image.getHeight(null)/2){
+			System.out.println(obj.distance(obj.TNT_pos.get(i).get(0)+TNT_Image.getWidth(null)/2,endx)+" "+obj.distance(obj.TNT_pos.get(i).get(1)+TNT_Image.getHeight(null)/2,endx));
+			if (obj.TNT_pos.get(i).get(0)<=endx && obj.TNT_pos.get(i).get(0)+TNT_Image.getWidth(null)>=endx && obj.TNT_pos.get(i).get(1)<=endy && obj.TNT_pos.get(i).get(1)+TNT_Image.getHeight(null)>=endy){
 				explode_thisRound.add(obj.TNT_pos.get(i));
+				System.out.println(i+"numTNT");
 			}
 		}
 		for (int i=0;i<explode_thisRound.size();i++){
@@ -165,10 +166,6 @@ class GamePanel extends JPanel implements KeyListener{
 			g.drawImage(TNT_Image,obj.TNT_pos.get(i).get(0),obj.TNT_pos.get(i).get(1),this);
 		}
 		g.setColor(Color.black);
-		//g.drawOval(300+TNT_Image.getWidth(null)-150, 300+TNT_Image.getHeight(null)-150, 300, 300);
-		//g.drawOval(300-100, 300-100, 200, 200);
-		//g.drawOval(300+TNT_Image.getWidth(null)/2,300+TNT_Image.getHeight(null)/2,20,20);
-		//g.drawOval(300+TNT_Image.getWidth(null)/2-200, 300+TNT_Image.getHeight(null)/2-200, 200, 200);
 		//drawing strings
 		Font font = new Font("Calisto MT", Font.PLAIN, 20);
 		g.setFont(font);
