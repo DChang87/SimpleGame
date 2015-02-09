@@ -16,8 +16,9 @@ import javax.swing.JPanel;
 import java.util.*;
 
 class GamePanel extends JPanel implements KeyListener{
-	private final int RIGHT=1,LEFT=-1;
-	private int endx,endy,direction=LEFT,angle=20,startx,starty;
+	private final int RIGHT=1,LEFT=-1,NODIRECTION=0;
+	private int endx,endy,direction=LEFT,startx,starty;
+	private double angle=20;
 	private boolean[] keys;
 	//old down = 3, up = -0.5
 	private double down=5,up=-1.5,shootdire=down,length=50;
@@ -25,6 +26,8 @@ class GamePanel extends JPanel implements KeyListener{
 	public boolean ready=false;
 	private Miner mainFrame;
 	//obj
+	private Image man = new ImageIcon("man.png").getImage();
+	private int manPos=0;
 	private ArrayList<Integer> goals=new ArrayList<Integer>();
 	private int numDynamites;
 	private static Image dynamitePic = new ImageIcon("dynamite.png").getImage();
@@ -34,6 +37,7 @@ class GamePanel extends JPanel implements KeyListener{
 	public static ArrayList<ArrayList<Integer>> explode_thisRound = new ArrayList<ArrayList<Integer>>();
 	private Image background;
 	private int TNT_timer=0;
+	private int manDirection=NODIRECTION;
 	private int boom_timer = -1;
 	private int objcaught=-1;
 	private int totals=200;
@@ -43,9 +47,9 @@ class GamePanel extends JPanel implements KeyListener{
 		numDynamites=3;
 		keys = new boolean[65535];
 		goals.add(1);
-		background = new ImageIcon("goldminer1.jpg").getImage();
+		background = new ImageIcon("goldminer2.jpg").getImage();
 		mainFrame=m;
-		startx=400;
+		startx=30;
 		starty=90;
 		setSize(800,640);
 		addKeyListener(this);
@@ -56,6 +60,20 @@ class GamePanel extends JPanel implements KeyListener{
         requestFocus();
         mainFrame.start();
     }
+	public void moveMan(){
+		if (keys[KeyEvent.VK_LEFT]){
+			manDirection=LEFT;
+			manPos=Math.max(0, manPos-5);
+		}
+		else if (keys[KeyEvent.VK_RIGHT]){
+			manDirection=RIGHT;
+			manPos=Math.min(450,manPos+5);
+		}
+		else{
+			manDirection=NODIRECTION;
+		}
+		startx=130+manPos;
+	}
 	public void move(){
 		//swing
 		obj.movePigs(objcaught);
@@ -75,16 +93,19 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 		//calling old TNT's and checking for new exploding ones that the user reached
 		for (int i=0;i<obj.numTNT;i++){
-			System.out.println(obj.distance(obj.TNT_pos.get(i).get(0)+TNT_Image.getWidth(null)/2,endx)+" "+obj.distance(obj.TNT_pos.get(i).get(1)+TNT_Image.getHeight(null)/2,endx));
+			
 			if (obj.TNT_pos.get(i).get(0)<=endx && obj.TNT_pos.get(i).get(0)+TNT_Image.getWidth(null)>=endx && obj.TNT_pos.get(i).get(1)<=endy && obj.TNT_pos.get(i).get(1)+TNT_Image.getHeight(null)>=endy){
 				explode_thisRound.add(obj.TNT_pos.get(i));
-				System.out.println(i+"numTNT");
+				
 			}
 		}
 		for (int i=0;i<explode_thisRound.size();i++){
 			//get the co-ords at explode_thisRound, find the index at TNT_pos and call checkTNT on it to add more things to explode_nextRound;
-			System.out.println("THIS ROUND LOOP"+explode_thisRound.size());
-			obj.checkTNT(obj.TNT_pos.indexOf(explode_thisRound.get(i)));
+			for (int k=0;k<obj.TNT_pos.size();k++){
+				if (obj.TNT_pos.get(k)==explode_thisRound.get(i)){
+					obj.checkTNT(k);
+				}
+			}
 		}
 		
 		if (objcaught!=-1){
@@ -129,13 +150,12 @@ class GamePanel extends JPanel implements KeyListener{
 	}
 
 	public void changeTime(){
-		//System.out.println("changetime");
+		
 		if (totals==0){
 			totals=1234;
 		}
 		totals--;
 		if (boom_timer!=-1){
-			System.out.println("changetime yo");
 			boom_timer+=1;
 		}
 	}
@@ -148,19 +168,30 @@ class GamePanel extends JPanel implements KeyListener{
     	keys[e.getKeyCode()]=false;
     }
 	public void paintComponent(Graphics g){
-		//System.out.println("paint"+TNT_timer);
 		g.drawImage(background,0,0,this);  
 		g.setColor(Color.black);
+		
+		if (manDirection==RIGHT){
+			System.out.println("RIGHT");
+			//endx=Math.max(0,endx-10);
+			angle=Math.min(160, angle+0.7);
+		}
+		else if (manDirection==LEFT){
+			System.out.println("LEFT");
+			angle=Math.max(0, angle-0.7);
+			//endx=Math.min(800, endx+10);
+		}
 		endx=startx+(int)(length*Math.cos(Math.toRadians(angle)));
 		endy=starty+(int)(length*(Math.sin(Math.toRadians(angle))));
-		g.drawLine(startx,starty,endx,endy);
 		g.setColor(Color.yellow);
 		Graphics2D g2d = (Graphics2D)g;
-		for (int i=0;i<obj.numobj;i++){
-			g.drawImage(obj.sprites.get(i),obj.integer_data.get(i).get(obj.X),obj.integer_data.get(i).get(obj.Y),this);
-		}
 		for (int i=0;i<numDynamites;i++){
 			g.drawImage(dynamitePic,460+i*35,85,this);
+		}
+		g.drawImage(man,100+manPos,43,this);
+		g.drawLine(startx,starty,endx,endy);
+		for (int i=0;i<obj.numobj;i++){
+			g.drawImage(obj.sprites.get(i),obj.integer_data.get(i).get(obj.X),obj.integer_data.get(i).get(obj.Y),this);
 		}
 		for (int i=0;i<obj.numTNT;i++){
 			g.drawImage(TNT_Image,obj.TNT_pos.get(i).get(0),obj.TNT_pos.get(i).get(1),this);
@@ -173,12 +204,9 @@ class GamePanel extends JPanel implements KeyListener{
 		g.drawString("Goal: "+goals.get(obj.current_level-1),20,90);
 		g.drawString("current level: "+obj.current_level,680,90);
 		g.drawString("Money: "+totalval, 20, 55);
-		//System.out.println("timer"+boom_timer+explode_thisRound.size());
 		for (int i=0;i<explode_thisRound.size();i++){
-			//System.out.println("explode?");
 			if (boom_timer<1){
 				g.drawImage(boomPic,explode_thisRound.get(i).get(0)+TNT_Image.getWidth(null)/2-boomPic.getWidth(null)/2,explode_thisRound.get(i).get(1)+TNT_Image.getHeight(null)/2-boomPic.getHeight(null)/2,this);
-				//ystem.out.println("explode?");
 				if (boom_timer==-1){
 					boom_timer=0;
 					shootdire=up;
@@ -190,13 +218,13 @@ class GamePanel extends JPanel implements KeyListener{
 				
 				boom_timer=-1; //-1 indicates that it will not be timed until the timer is back at 0
 			}
-			//System.out.println("timerAFTER"+boom_timer);
 		}
 		if (boom_timer==-1){
+			//maybe delete this line:
 			explode_thisRound.clear();
 		}
-		if (1000<TNT_timer && TNT_timer<=3000){
-			System.out.println("TRUE");
+		if (30==TNT_timer){
+			explode_thisRound.clear();
 			//if it is time, draw the exploding TNT's and replace them with the ones that will be exploded next time the timer is at 2
 			for (int i=0;i<explode_nextRound.size();i++){
 				explode_thisRound.add(explode_nextRound.get(i));
