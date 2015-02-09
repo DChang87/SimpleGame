@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
+
 public class Miner extends JFrame implements ActionListener {
 	Timer myTimer;
 	GamePanel game;
@@ -8,7 +10,7 @@ public class Miner extends JFrame implements ActionListener {
 	public Miner(){
 		super("Gold Miner");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(800,500);
+		setSize(800,640);
 		setLayout(new BorderLayout());
 		game = new GamePanel(this);
 		game.setLocation(0,0);
@@ -16,7 +18,7 @@ public class Miner extends JFrame implements ActionListener {
 		add(game);
 		gameTimer = new Timer(1000,this);
 		myTimer = new Timer(20,this);
-		//setResizable(false);
+		setResizable(false);
 		setVisible(true);
 	}
 	public void start(){
@@ -28,6 +30,7 @@ public class Miner extends JFrame implements ActionListener {
 		
 		if (source==myTimer){
 			game.move();
+			game.throwDynamite();
 		}
 		if (source==gameTimer){
 			game.changeTime();
