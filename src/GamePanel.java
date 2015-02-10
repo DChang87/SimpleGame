@@ -15,7 +15,8 @@ import java.util.*;
 
 
 class GamePanel extends JPanel implements KeyListener{
-	private AudioClip back,pull;
+	private AudioClip back;
+	public static AudioClip pull,pigsound,dynamitesound,TNTsound;
 	private final int RIGHT=1,LEFT=-1,NODIRECTION=0;
 	public static int endx,endy;
 	private int direction=LEFT,startx,starty;
@@ -49,7 +50,10 @@ class GamePanel extends JPanel implements KeyListener{
 		totals=obj.returnTimes();
 		numDynamites=3;
 		back = Applet.newAudioClip(getClass().getResource("back.wav"));
+		pigsound = Applet.newAudioClip(getClass().getResource("pigoink.wav"));
 		pull = Applet.newAudioClip(getClass().getResource("pull.wav"));
+		dynamitesound = Applet.newAudioClip(getClass().getResource("dynamitesound.wav"));
+		TNTsound = Applet.newAudioClip(getClass().getResource("TNTsound.wav"));
 		back.loop();
 		keys = new boolean[65535];
 		goals.add(1);
@@ -118,7 +122,6 @@ class GamePanel extends JPanel implements KeyListener{
 			//this means that a piece of obj has been caught
 			obj.move(objcaught,endx,endy);
 			shootdire=obj.returnSpeed(objcaught);
-			pull.play();
 			if (length==50){
 				totalval+=obj.returnIntData(objcaught,obj.VAL);
 				obj.removeVal(objcaught);
@@ -126,8 +129,8 @@ class GamePanel extends JPanel implements KeyListener{
 			}
 		}
 		else{
+			pull.stop();
 			if (shootdire==down){
-				pull.stop();
 				objcaught = obj.catchobj();
 			}
 		}
@@ -149,6 +152,7 @@ class GamePanel extends JPanel implements KeyListener{
 	public void throwDynamite(){
 		if (keys[KeyEvent.VK_D] && numDynamites>0){
 			if (objcaught!=-1){
+				dynamitesound.play();
 				obj.removeVal(objcaught);
 				numDynamites-=1;
 				objcaught=-1;
@@ -246,6 +250,7 @@ class GamePanel extends JPanel implements KeyListener{
 		g.drawString("Money: "+totalval, 20, 55);
 		for (int i=0;i<explode_thisRound.size();i++){
 			if (boom_timer<1){
+				TNTsound.play();
 				g.drawImage(boomPic,explode_thisRound.get(i).get(0)+TNT_Image.getWidth(null)/2-boomPic.getWidth(null)/2,explode_thisRound.get(i).get(1)+TNT_Image.getHeight(null)/2-boomPic.getHeight(null)/2,this);
 				if (boom_timer==-1){
 					boom_timer=0;
