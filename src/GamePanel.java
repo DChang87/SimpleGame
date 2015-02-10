@@ -5,12 +5,16 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.applet.*;
+
 import javax.sound.sampled.*;
 import javax.swing.*;
+
 import java.awt.image.*; 
 import java.io.*; 
+
 import javax.imageio.*; 
 import javax.swing.JPanel;
+
 import java.util.*;
 
 
@@ -18,6 +22,7 @@ class GamePanel extends JPanel implements KeyListener{
 	private AudioClip back;
 	public static AudioClip pull,pigsound,dynamitesound,TNTsound;
 	private final int RIGHT=1,LEFT=-1,NODIRECTION=0;
+	private Image scoreboard;
 	public static int endx,endy;
 	private int direction=LEFT,startx,starty;
 	private double angle=20;
@@ -55,6 +60,7 @@ class GamePanel extends JPanel implements KeyListener{
 		dynamitesound = Applet.newAudioClip(getClass().getResource("dynamitesound.wav"));
 		TNTsound = Applet.newAudioClip(getClass().getResource("TNTsound.wav"));
 		back.loop();
+		scoreboard = new ImageIcon("scoreboard.jpg").getImage();
 		keys = new boolean[65535];
 		goals.add(1);
 		background = new ImageIcon("goldminer2.jpg").getImage();
@@ -170,10 +176,11 @@ class GamePanel extends JPanel implements KeyListener{
 			newLevel();
 		}
 	}
+	private final int max_level=2;
 	public void newLevel(){
 		current_level+=1;
-		if (current_level>5){
-			gameFinished();
+		if (current_level>max_level){
+			mainFrame.hs.gameFinished(totalval, getName());
 		}
 		else{
 			//mainFrame.state = mainFrame.SHOP;
@@ -186,8 +193,9 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 		
 	}
-	public void gameFinished(){
-		
+	public String getName(){
+		String name = JOptionPane.showInputDialog("Name: ");
+		return name;
 	}
 	public void changeTime(){
 		
@@ -214,69 +222,79 @@ class GamePanel extends JPanel implements KeyListener{
     	keys[e.getKeyCode()]=false;
     }
 	public void paintComponent(Graphics g){
-		g.drawImage(background,0,0,this);  
-		g.setColor(Color.black);
-		
-		if (manDirection==RIGHT && manPos!=450){
-			//endx=Math.max(0,endx-10);
-			angle=Math.min(160, angle+0.7);
+		Font Sfont = new Font("Calisto MT", Font.BOLD, 30);
+		g.setFont(Sfont);
+		if (current_level>max_level){
+			g.drawImage(scoreboard,0,0,this);
+			for (int i=0;i<10;i++){
+				g.drawString((i+1)+". "+mainFrame.hs.returnName(i)+ "                                                  "+mainFrame.hs.returnScore(i),50,200+40*i);
+			}
 		}
-		else if (manDirection==LEFT && manPos!=0){
-			angle=Math.max(0, angle-0.7);
-			//endx=Math.min(800, endx+10);
-		}
-		endx=startx+(int)(length*Math.cos(Math.toRadians(angle)));
-		endy=starty+(int)(length*(Math.sin(Math.toRadians(angle))));
-		g.setColor(Color.yellow);
-		Graphics2D g2d = (Graphics2D)g;
-		for (int i=0;i<numDynamites;i++){
-			g.drawImage(dynamitePic,460+i*35,85,this);
-		}
-		g.drawImage(man,100+manPos,43,this);
-		g.drawLine(startx,starty,endx,endy);
-		for (int i=0;i<obj.numobj;i++){
-			g.drawImage(obj.returnSprites(i),obj.returnIntData(i,obj.X),obj.returnIntData(i,obj.Y),this);
-		}
-		for (int i=0;i<obj.numTNT;i++){
-			g.drawImage(TNT_Image,obj.returnTNT_pos(i,0),obj.returnTNT_pos(i,1),this);
-		}
-		g.setColor(Color.black);
-		//drawing strings
-		Font font = new Font("Calisto MT", Font.PLAIN, 20);
-		g.setFont(font);
-		g.drawString("Time: "+totals, 680, 55);
-		g.drawString("Goal: "+obj.returnGoals(),20,90);
-		g.drawString("Level: "+current_level,680,90);
-		g.drawString("Money: "+totalval, 20, 55);
-		for (int i=0;i<explode_thisRound.size();i++){
-			if (boom_timer<1){
-				TNTsound.play();
-				g.drawImage(boomPic,explode_thisRound.get(i).get(0)+TNT_Image.getWidth(null)/2-boomPic.getWidth(null)/2,explode_thisRound.get(i).get(1)+TNT_Image.getHeight(null)/2-boomPic.getHeight(null)/2,this);
-				if (boom_timer==-1){
-					boom_timer=0;
-					shootdire=up;
+		if (current_level<=max_level){
+			g.drawImage(background,0,0,this);  
+			g.setColor(Color.black);
+			
+			if (manDirection==RIGHT && manPos!=450){
+				//endx=Math.max(0,endx-10);
+				angle=Math.min(160, angle+0.7);
+			}
+			else if (manDirection==LEFT && manPos!=0){
+				angle=Math.max(0, angle-0.7);
+				//endx=Math.min(800, endx+10);
+			}
+			endx=startx+(int)(length*Math.cos(Math.toRadians(angle)));
+			endy=starty+(int)(length*(Math.sin(Math.toRadians(angle))));
+			g.setColor(Color.yellow);
+			Graphics2D g2d = (Graphics2D)g;
+			for (int i=0;i<numDynamites;i++){
+				g.drawImage(dynamitePic,460+i*35,85,this);
+			}
+			g.drawImage(man,100+manPos,43,this);
+			g.drawLine(startx,starty,endx,endy);
+			for (int i=0;i<obj.numobj;i++){
+				g.drawImage(obj.returnSprites(i),obj.returnIntData(i,obj.X),obj.returnIntData(i,obj.Y),this);
+			}
+			for (int i=0;i<obj.numTNT;i++){
+				g.drawImage(TNT_Image,obj.returnTNT_pos(i,0),obj.returnTNT_pos(i,1),this);
+			}
+			g.setColor(Color.black);
+			//drawing strings
+			Font font = new Font("Calisto MT", Font.PLAIN, 20);
+			g.setFont(font);
+			g.drawString("Time: "+totals, 680, 55);
+			g.drawString("Goal: "+obj.returnGoals(),20,90);
+			g.drawString("Level: "+current_level,680,90);
+			g.drawString("Money: "+totalval, 20, 55);
+			for (int i=0;i<explode_thisRound.size();i++){
+				if (boom_timer<1){
+					TNTsound.play();
+					g.drawImage(boomPic,explode_thisRound.get(i).get(0)+TNT_Image.getWidth(null)/2-boomPic.getWidth(null)/2,explode_thisRound.get(i).get(1)+TNT_Image.getHeight(null)/2-boomPic.getHeight(null)/2,this);
+					if (boom_timer==-1){
+						boom_timer=0;
+						shootdire=up;
+					}
+				}
+				else{
+					obj.removeTNT_pos(explode_thisRound.get(i));
+					obj.numTNT-=1;
+					
+					boom_timer=-1; //-1 indicates that it will not be timed until the timer is back at 0
 				}
 			}
-			else{
-				obj.removeTNT_pos(explode_thisRound.get(i));
-				obj.numTNT-=1;
-				
-				boom_timer=-1; //-1 indicates that it will not be timed until the timer is back at 0
+			if (boom_timer==-1){
+				//maybe delete this line:
+				explode_thisRound.clear();
 			}
-		}
-		if (boom_timer==-1){
-			//maybe delete this line:
-			explode_thisRound.clear();
-		}
-		if (30==TNT_timer){
-			explode_thisRound.clear();
-			//if it is time, draw the exploding TNT's and replace them with the ones that will be exploded next time the timer is at 2
-			for (int i=0;i<explode_nextRound.size();i++){
-				explode_thisRound.add(explode_nextRound.get(i));
+			if (30==TNT_timer){
+				explode_thisRound.clear();
+				//if it is time, draw the exploding TNT's and replace them with the ones that will be exploded next time the timer is at 2
+				for (int i=0;i<explode_nextRound.size();i++){
+					explode_thisRound.add(explode_nextRound.get(i));
+				}
+				explode_nextRound.clear();
+				TNT_timer=0;
 			}
-			explode_nextRound.clear();
-			TNT_timer=0;
+			TNT_timer++;
 		}
-		TNT_timer++;
 	}
 }
