@@ -90,6 +90,7 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 		startx=130+manPos;
 	}
+	
 	public void move(){
 		//swing
 		obj.movePigs(objcaught);
@@ -167,19 +168,23 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 	}
 	public void timesUp(){
+		setFocusable(false);
 		JOptionPane.showMessageDialog (null, "Time is up for level"+current_level);
 		newLevel();
+		requestFocus();
 	}
 	public void checkIfLevelIsDone(){
 		if (obj.returnNumObj()==0){
+			setFocusable(false);
 			JOptionPane.showMessageDialog (null, "You have grabbed everything for level"+current_level);
 			newLevel();
+			requestFocus();
 		}
 	}
 	private final int max_level=2;
 	public void newLevel(){
 		current_level+=1;
-		if (current_level>max_level){
+		if (mainFrame.hs.returnLoading()){
 			mainFrame.hs.gameFinished(totalval, getName());
 		}
 		else if (totalval<obj.returnGoals()){
@@ -225,23 +230,22 @@ class GamePanel extends JPanel implements KeyListener{
 	public void paintComponent(Graphics g){
 		Font Sfont = new Font("Calisto MT", Font.BOLD, 30);
 		g.setFont(Sfont);
-		if (current_level>max_level){
+		if (mainFrame.hs.returnLoading()){
 			g.drawImage(scoreboard,0,0,this);
 			for (int i=0;i<10;i++){
-				g.drawString((i+1)+". "+mainFrame.hs.returnName(i)+ "                                                  "+mainFrame.hs.returnScore(i),50,200+40*i);
+				g.drawString((i+1)+". "+mainFrame.hs.returnName(i),50,200+40*i);
+				g.drawString(mainFrame.hs.returnScore(i)+"", 500, 200+40*i);
 			}
 		}
-		if (current_level<=max_level){
+		else if (current_level<=max_level){
 			g.drawImage(background,0,0,this);  
 			g.setColor(Color.black);
 			
 			if (manDirection==RIGHT && manPos!=450){
-				//endx=Math.max(0,endx-10);
 				angle=Math.min(160, angle+0.7);
 			}
 			else if (manDirection==LEFT && manPos!=0){
 				angle=Math.max(0, angle-0.7);
-				//endx=Math.min(800, endx+10);
 			}
 			endx=startx+(int)(length*Math.cos(Math.toRadians(angle)));
 			endy=starty+(int)(length*(Math.sin(Math.toRadians(angle))));
