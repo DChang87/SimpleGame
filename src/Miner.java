@@ -7,6 +7,7 @@ public class Miner extends JFrame implements ActionListener {
 	Timer myTimer;
 	GamePanel game;
 	Timer gameTimer;
+	HighScores hs;
 	StartScreen ss;
 	Shop shop;
 	public static final int GAME=1,MENU=0,SHOP=2;
@@ -18,6 +19,7 @@ public class Miner extends JFrame implements ActionListener {
 		setLayout(new BorderLayout());
 		ss = new StartScreen(this);
 		game = new GamePanel(this);
+		hs = new HighScores();
 		ss.setLocation(0,0);
 		ss.setSize(800,640);
 		add(ss);
@@ -39,15 +41,6 @@ public class Miner extends JFrame implements ActionListener {
     	gameTimer.start();
     }
 	public void actionPerformed(ActionEvent evt){
-		/*if (ss.isFocusOwner()){
-			System.out.println("fricking ss");
-		}
-		else if (game.isFocusOwner()){
-			System.out.println("game is owner");
-		}
-		else if (shop.isFocusOwner()){
-			System.out.println("shop owns it");
-		}*/
 		Object source = evt.getSource();
 		if (state==MENU){
 			ss.repaint();
