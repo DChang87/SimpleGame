@@ -19,38 +19,46 @@ import java.util.*;
 
 
 class GamePanel extends JPanel implements KeyListener{
+	//Audio:
 	private AudioClip back;
 	public static AudioClip pull,pigsound,dynamitesound,TNTsound;
-	private final int RIGHT=1,LEFT=-1,NODIRECTION=0;
+	
+	//Images:
+	private Image man = new ImageIcon("man.png").getImage();
 	private Image scoreboard;
+	private static Image dynamitePic = new ImageIcon("dynamite.png").getImage();
+	public static Image TNT_Image = new ImageIcon("tnt.png").getImage();
+	private static Image boomPic = new ImageIcon("boom.png").getImage();
+	private Image background;
+	
+	//classes:
+	public Objects obj = new Objects();
+	private Miner mainFrame;
+	
+	//explosion arraylists:
+	public static ArrayList<ArrayList<Integer>> explode_nextRound = new ArrayList<ArrayList<Integer>>(); //all of the TNT that should be exploded
+	public static ArrayList<ArrayList<Integer>> explode_thisRound = new ArrayList<ArrayList<Integer>>();
+	
+	//miscellaneous variables to set up the game
+	private final int RIGHT=1,LEFT=-1,NODIRECTION=0;
 	public static int endx,endy;
 	private int direction=LEFT,startx,starty;
 	private double angle=20;
 	private boolean[] keys;
-	//old down = 3, up = -0.5
 	private double down=5,up=-1.5,shootdire=down,length=50;
 	private boolean shooting;
 	public boolean ready=false;
-	private Miner mainFrame;
-	//obj
-	private Image man = new ImageIcon("man.png").getImage();
 	private static int current_level=1;
 	private int manPos=0;
 	private ArrayList<Integer> goals=new ArrayList<Integer>();
 	private int numDynamites;
-	private static Image dynamitePic = new ImageIcon("dynamite.png").getImage();
-	public static Image TNT_Image = new ImageIcon("tnt.png").getImage();
-	private static Image boomPic = new ImageIcon("boom.png").getImage();
-	public static ArrayList<ArrayList<Integer>> explode_nextRound = new ArrayList<ArrayList<Integer>>(); //all of the TNT that should be exploded
-	public static ArrayList<ArrayList<Integer>> explode_thisRound = new ArrayList<ArrayList<Integer>>();
-	private Image background;
 	private int TNT_timer=0;
 	private int manDirection=NODIRECTION;
-	private int boom_timer = -1;
+	private int boom_timer = -1; //this is used to figure out the time an which the boom effect takes place
 	private int objcaught=-1;
 	private int totals;
 	private int totalval=0;
-	public Objects obj = new Objects();
+	
 	public GamePanel(Miner m){
 		totals=obj.returnTimes();
 		numDynamites=3;
@@ -171,6 +179,7 @@ class GamePanel extends JPanel implements KeyListener{
 		setFocusable(false);
 		JOptionPane.showMessageDialog (null, "Time is up for level"+current_level);
 		newLevel();
+		setFocusable(true);
 		requestFocus();
 	}
 	public void checkIfLevelIsDone(){
@@ -178,10 +187,11 @@ class GamePanel extends JPanel implements KeyListener{
 			setFocusable(false);
 			JOptionPane.showMessageDialog (null, "You have grabbed everything for level"+current_level);
 			newLevel();
+			setFocusable(true);
 			requestFocus();
 		}
 	}
-	private final int max_level=2;
+	private final int max_level=5;
 	public void newLevel(){
 		current_level+=1;
 		if (mainFrame.hs.returnLoading()){
@@ -197,7 +207,7 @@ class GamePanel extends JPanel implements KeyListener{
 			totals = obj.returnTimes();
 			length=50;
 		}
-		
+		//requestFocus();
 	}
 	public String getName(){
 		String name = JOptionPane.showInputDialog("Name: ");
