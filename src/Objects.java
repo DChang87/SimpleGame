@@ -87,6 +87,10 @@ class Objects {
 				//GamePanel.endx=integer_data.get(i).get(X);
 				//System.out.println(GamePanel.endx+" "+GamePanel.endy);
 				///set the position to the clamp to where the clamp touched the sprite
+				if (integer_data.get(i).get(TYPE)==PIG){
+					GamePanel.pigsound.play();
+				}
+				GamePanel.pull.loop();
 				return i; 
 			}	
 		}
