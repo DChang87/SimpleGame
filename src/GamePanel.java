@@ -182,10 +182,11 @@ class GamePanel extends JPanel implements KeyListener{
 		if (current_level>max_level){
 			mainFrame.hs.gameFinished(totalval, getName());
 		}
+		else if (totalval<obj.returnGoals()){
+			JOptionPane.showMessageDialog (null, "You did not meet the goal for this level. Good luck next time.");
+			mainFrame.hs.gameFinished(totalval, getName());
+		}
 		else{
-			//mainFrame.state = mainFrame.SHOP;
-			//setFocusable(false);
-			//mainFrame.shop.requestFocus();
 			obj.clearEverything();
 			obj.loadMyStuff(current_level);
 			totals = obj.returnTimes();
