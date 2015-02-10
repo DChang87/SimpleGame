@@ -167,6 +167,9 @@ class GamePanel extends JPanel implements KeyListener{
 			gameFinished();
 		}
 		else{
+			//mainFrame.state = mainFrame.SHOP;
+			//setFocusable(false);
+			//mainFrame.shop.requestFocus();
 			obj.clearEverything();
 			obj.loadMyStuff(current_level);
 			totals = obj.returnTimes();
