@@ -7,8 +7,11 @@ import java.util.Scanner;
 class HighScores {
 	public HighScores(){
 		readFile();
-		openNewFile();
 	}
+	private static int[] newTopScores = new int[10];
+	private static String[] newTopNames = new String[10];
+	
+	private static boolean doneLoading=false;
 	private static int [] topScores = new int[10];
 	private static String[] topNames = new String[10];
 	static FileWriter outfile;
@@ -22,8 +25,12 @@ class HighScores {
 		}
 		for (int i=0;i<10;i++){
 			topScores[i]=infile.nextInt();
+			System.out.println(topScores[i]);
 			topNames[i]=infile.next();
 		}
+	}
+	public static boolean returnLoading(){
+		return doneLoading;
 	}
 	public static void openNewFile(){
 		try{
@@ -45,20 +52,28 @@ class HighScores {
 		return pos;
 	}
 	public static int returnScore(int index){
-		return (topScores[index]);
+		return newTopScores[index];
 	}
 	public static String returnName(int index){
-		return topNames[index];
+		return newTopNames[index];
 	}
 	public static void gameFinished(int score,String name){
+		openNewFile();
 		int pos = placement(score);
 		if (pos!=-1){
 			for (int i=0;i<pos;i++){
 				tryWriting(topScores[i]+" "+topNames[i]+"\n");
+				newTopScores[i]=topScores[i];
+				newTopNames[i]=topNames[i];
 			}
 			tryWriting(score+" "+name+"\n");
-			for (int i=pos+1;i<10;i++){
-				tryWriting(topScores[i]+" "+topNames[i]+"\n");
+			newTopScores[pos]=score;
+			newTopNames[pos]=name;
+			for (int i=0;i<9-pos;i++){
+				tryWriting(topScores[pos+i]+" "+topNames[pos+i]+"\n");
+				System.out.println(pos+1+i+"POS");
+				newTopScores[pos+1+i]=topScores[pos+i];
+				newTopNames[pos+1+i]=topNames[pos+i];
 			}
 		}
 		try {
@@ -67,7 +82,7 @@ class HighScores {
 		catch (IOException e) {
 			System.out.println("Cannot close HighScore.txt");
 		}
-		readFile();
+		doneLoading=true;
 	}
 	public static void tryWriting(String s){
 		try{
