@@ -4,18 +4,18 @@ import java.awt.geom.*;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
-
+import java.applet.*;
+import javax.sound.sampled.*;
 import javax.swing.*;
-
 import java.awt.image.*; 
 import java.io.*; 
-
 import javax.imageio.*; 
 import javax.swing.JPanel;
-
 import java.util.*;
 
+
 class GamePanel extends JPanel implements KeyListener{
+	private AudioClip back,pull;
 	private final int RIGHT=1,LEFT=-1,NODIRECTION=0;
 	public static int endx,endy;
 	private int direction=LEFT,startx,starty;
@@ -48,6 +48,9 @@ class GamePanel extends JPanel implements KeyListener{
 	public GamePanel(Miner m){
 		totals=obj.returnTimes();
 		numDynamites=3;
+		back = Applet.newAudioClip(getClass().getResource("back.wav"));
+		pull = Applet.newAudioClip(getClass().getResource("pull.wav"));
+		back.loop();
 		keys = new boolean[65535];
 		goals.add(1);
 		background = new ImageIcon("goldminer2.jpg").getImage();
@@ -115,6 +118,7 @@ class GamePanel extends JPanel implements KeyListener{
 			//this means that a piece of obj has been caught
 			obj.move(objcaught,endx,endy);
 			shootdire=obj.returnSpeed(objcaught);
+			pull.play();
 			if (length==50){
 				totalval+=obj.returnIntData(objcaught,obj.VAL);
 				obj.removeVal(objcaught);
@@ -123,6 +127,7 @@ class GamePanel extends JPanel implements KeyListener{
 		}
 		else{
 			if (shootdire==down){
+				pull.stop();
 				objcaught = obj.catchobj();
 			}
 		}
